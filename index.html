@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Bingo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Bingo</h1>
+        <div class="game-controls">
+            <button id="new-game">Nuevo Juego</button>
+            <button id="draw-number">Sacar Número</button>
+        </div>
+        
+        <div class="all-numbers">
+            <h2>Todos los Números (1-90)</h2>
+            <div id="numbers-board" class="numbers-board">
+                <!-- Los números del 1 al 90 se generarán aquí mediante JavaScript -->
+            </div>
+        </div>
+        
+        
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            /* 
+             * REFERENCIAS A ELEMENTOS DEL DOM
+             * ------------------------------
+             * Obtenemos referencias a todos los elementos HTML que necesitaremos manipular
+             */
+            const newGameBtn = document.getElementById('new-game');              // Botón para iniciar nuevo juego
+            const drawNumberBtn = document.getElementById('draw-number');        // Botón para sacar un número
+            const playAgainBtn = document.getElementById('play-again');         // Botón para jugar de nuevo
+            const numbersBoard = document.getElementById('numbers-board');      // Tablero con todos los números
+            
+            /* 
+             * VARIABLES DE ESTADO DEL JUEGO
+             * ----------------------------
+             * Estas variables mantienen el estado actual del juego
+             */
+            let drawnNumbers = [];   // Array que almacena los números que han salido
+            let gameActive = false;  // Indica si el juego está activo o no
+            
+            /* 
+             * CONSTANTES DEL JUEGO
+             * -------------------
+             * Definimos las reglas y parámetros del juego de Bingo
+             */
+            const MAX_NUMBER = 90;   // Número máximo que puede salir (1-90)
+            
+            /**
+             * FUNCIÓN: CREAR TABLERO DE NÚMEROS
+             * -------------------------------
+             * Esta función crea un tablero visual con todos los números del 1 al 90
+             */
+            function createNumbersBoard() {
+                numbersBoard.innerHTML = '';
+                
+                // Crear celdas para cada número del 1 al 90
+                for (let i = 1; i <= 90; i++) {
+                    const numberCell = document.createElement('div');
+                    numberCell.className = 'number-cell';
+                    numberCell.textContent = i;
+                    numberCell.dataset.number = i;
+                    numbersBoard.appendChild(numberCell);
+                }
+            }
+            
+            /**
+             * FUNCIÓN: ACTUALIZAR TABLERO DE NÚMEROS
+             * ----------------------------------
+             * Esta función actualiza el tablero de números, marcando los que han salido
+             * y destacando el último número con un color diferente
+             */
+            function updateNumbersBoard() {
+                // Resetear todas las celdas
+                const cells = numbersBoard.querySelectorAll('.number-cell');
+                cells.forEach(cell => {
+                    cell.classList.remove('drawn');
+                    cell.classList.remove('last-drawn');
+                });
+                
+                // Marcar los números que han salido
+                drawnNumbers.forEach((number, index) => {
+                    const cell = numbersBoard.querySelector(`.number-cell[data-number="${number}"]`);
+                    if (cell) {
+                        cell.classList.add('drawn');
+                        
+                        // Si es el último número sacado, añadir clase especial
+                        if (index === drawnNumbers.length - 1) {
+                            cell.classList.add('last-drawn');
+                        }
+                    }
+                });
+            }
+            
+            /**
+             * FUNCIÓN: INICIAR NUEVO JUEGO
+             * ---------------------------
+             * Esta función reinicia el estado del juego y prepara todo para una nueva partida.
+             * Se llama al hacer clic en "Nuevo Juego" o "Jugar de Nuevo" y al cargar la página.
+             */
+            function startNewGame() {
+                // Reiniciar variables de estado a sus valores iniciales
+                drawnNumbers = [];   // Vaciar la lista de números sacados
+                gameActive = true;   // Activar el juego
+                
+                // Limpiar todas las celdas del tablero de números
+                const cells = numbersBoard.querySelectorAll('.number-cell');
+                cells.forEach(cell => {
+                    cell.classList.remove('drawn');
+                    cell.classList.remove('last-drawn');
+                });
+                
+                drawNumberBtn.disabled = false;  // Habilitar el botón de sacar número
+            }
+
+            /**
+             * FUNCIÓN: SACAR NÚMERO ALEATORIO
+             * -----------------------------
+             * Esta función simula la extracción de una bola de bingo aleatoria
+             * y actualiza el tablero de números.
+             */
+            function drawNumber() {
+                // Verificar si el juego está activo
+                if (!gameActive) return;  // No hacer nada si el juego no está activo
+                
+                // Generar un número que no haya salido antes
+                let newNumber;
+                do {
+                    // Seleccionar un número aleatorio del 1 al 90, pero limitando la cantidad total
+                    newNumber = Math.floor(Math.random() * MAX_NUMBER) + 1;  // Número entre 1 y 90
+                } while (drawnNumbers.includes(newNumber));  // Repetir si ya ha salido
+                
+                // Añadir a la lista de números sacados
+                drawnNumbers.push(newNumber);  // Registrar el número extraído
+                
+                // Actualizar la interfaz
+                updateNumbersBoard();  // Actualizar el tablero de números
+            }
+            
+           
+            
+            /**
+             * CONFIGURACIÓN DE EVENT LISTENERS
+             * ------------------------------
+             * Aquí configuramos los manejadores de eventos para los botones del juego
+             */
+            
+            // Botón de Nuevo Juego - Inicia una nueva partida
+            newGameBtn.addEventListener('click', startNewGame);
+            
+            // Botón de Sacar Número - Extrae un nuevo número aleatorio
+            drawNumberBtn.addEventListener('click', drawNumber);
+            
+            
+            
+            /**
+             * INICIALIZACIÓN DEL JUEGO
+             * -----------------------
+             * Iniciamos automáticamente el juego cuando se carga la página
+             */
+            createNumbersBoard();  // Crear el tablero con todos los números
+            startNewGame();  // Llamada inicial para preparar el primer juego
+        });
+    </script>
+</body>
+</html>
