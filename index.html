@@ -21,10 +21,17 @@
                 <!-- Los números del 1 al 90 se generarán aquí mediante JavaScript -->
             </div>
         </div>
-        
-        
+
+        <!-- Modal de confirmación -->
+        <div id="confirm-modal" class="modal hidden">
+            <div class="modal-content">
+                <p>¿Estás seguro de que deseas comenzar un nuevo juego? Se reiniciarán los números extraídos</p>
+                <button id="confirm-yes" class="btn-yes">Sí</button>
+                <button id="confirm-no" class="btn-no">No</button>
+            </div>
+        </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             /* 
@@ -37,6 +44,11 @@
             const playAgainBtn = document.getElementById('play-again');         // Botón para jugar de nuevo
             const numbersBoard = document.getElementById('numbers-board');      // Tablero con todos los números
             const drawBallsBtn = document.getElementById('draw-balls');      // Botón para mover las bolas
+
+            // Referencias al modal de confirmación
+            const confirmModal = document.getElementById('confirm-modal');
+            const confirmYesBtn = document.getElementById('confirm-yes');
+            const confirmNoBtn = document.getElementById('confirm-no');
             
             /* 
              * VARIABLES DE ESTADO DEL JUEGO
@@ -139,7 +151,17 @@
                 
                 // Añadir a la lista de números sacados
                 drawnNumbers.push(newNumber);  // Registrar el número extraído
-                
+
+                // Reproducir el audio correspondiente al número sacado
+                const audio = new Audio(`audios_numeros/numero_${newNumber}.mp3`);
+                audio.play().catch(err => console.error('Error al reproducir audio:', err));
+
+                // Deshabilitar temporalmente el botón para evitar más clics durante 5 s
+                drawNumberBtn.disabled = true;
+                setTimeout(() => {
+                    drawNumberBtn.disabled = false;
+                }, 2000);
+
                 // Actualizar la interfaz
                 updateNumbersBoard();  // Actualizar el tablero de números
             }
@@ -156,7 +178,7 @@
 
                 // Crear 5 bolas con números aleatorios sin afectar al tablero
                 const chosenNumbers = new Set();
-                for (let i = 0; i < 10; i++) {
+                for (let i = 0; i < 90; i++) {
                     const ball = document.createElement('div');
                     ball.className = 'bingo-ball';
                     
@@ -171,8 +193,8 @@
                     
                     // Posición inicial aleatoria
                     // Generar posiciones alrededor del centro para que las bolas aparezcan más cerca
-                    const rangeX = 120; // ancho del rango horizontal
-                    const rangeY = 120; // alto del rango vertical
+                    const rangeX = 350; // ancho del rango horizontal
+                    const rangeY = 350; // alto del rango vertical
                     const centerX = window.innerWidth / 2;
                     const centerY = window.innerHeight / 2;
                     const randomX = centerX - rangeX / 2 + Math.random() * rangeX;
@@ -203,8 +225,21 @@
              * Aquí configuramos los manejadores de eventos para los botones del juego
              */
             
-            // Botón de Nuevo Juego - Inicia una nueva partida
-            newGameBtn.addEventListener('click', startNewGame);
+            // Botón de Nuevo Juego - Abre el modal de confirmación
+            newGameBtn.addEventListener('click', () => {
+                confirmModal.classList.remove('hidden');
+            });
+
+            // Botón Sí en el modal
+            confirmYesBtn.addEventListener('click', () => {
+                startNewGame();
+                confirmModal.classList.add('hidden');
+            });
+
+            // Botón No en el modal
+            confirmNoBtn.addEventListener('click', () => {
+                confirmModal.classList.add('hidden');
+            });
             
             // Botón de Sacar Número - Extrae un nuevo número aleatorio
             drawNumberBtn.addEventListener('click', drawNumber);
