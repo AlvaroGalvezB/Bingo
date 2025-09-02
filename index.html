@@ -12,6 +12,7 @@
         <div class="game-controls">
             <button id="new-game">Nuevo Juego</button>
             <button id="draw-number">Sacar Número</button>
+            <button id="draw-balls">Mover Bolas</button>
         </div>
         
         <div class="all-numbers">
@@ -35,6 +36,7 @@
             const drawNumberBtn = document.getElementById('draw-number');        // Botón para sacar un número
             const playAgainBtn = document.getElementById('play-again');         // Botón para jugar de nuevo
             const numbersBoard = document.getElementById('numbers-board');      // Tablero con todos los números
+            const drawBallsBtn = document.getElementById('draw-balls');      // Botón para mover las bolas
             
             /* 
              * VARIABLES DE ESTADO DEL JUEGO
@@ -141,6 +143,57 @@
                 // Actualizar la interfaz
                 updateNumbersBoard();  // Actualizar el tablero de números
             }
+
+            function drawBalls() {
+                // Limpiar bolas existentes
+                const existingBalls = document.querySelectorAll('.bingo-ball');
+                existingBalls.forEach(ball => ball.remove());
+
+                // Crear overlay semitransparente para oscurecer el fondo
+                const overlay = document.createElement('div');
+                overlay.className = 'screen-dim';
+                document.body.appendChild(overlay);
+
+                // Crear 5 bolas con números aleatorios sin afectar al tablero
+                const chosenNumbers = new Set();
+                for (let i = 0; i < 10; i++) {
+                    const ball = document.createElement('div');
+                    ball.className = 'bingo-ball';
+                    
+                    // Asignar un número aleatorio que no haya salido
+                    let number;
+                    do {
+                        number = Math.floor(Math.random() * MAX_NUMBER) + 1;
+                    } while (chosenNumbers.has(number));
+                    chosenNumbers.add(number);
+                    
+                    ball.textContent = number;
+                    
+                    // Posición inicial aleatoria
+                    // Generar posiciones alrededor del centro para que las bolas aparezcan más cerca
+                    const rangeX = 120; // ancho del rango horizontal
+                    const rangeY = 120; // alto del rango vertical
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+                    const randomX = centerX - rangeX / 2 + Math.random() * rangeX;
+                    const randomY = centerY - rangeY / 2 + Math.random() * rangeY;
+                    
+                    ball.style.left = randomX + 'px';
+                    ball.style.top = randomY + 'px';
+                    
+                    // Añadir delay aleatorio a la animación
+                    ball.style.animationDelay = (Math.random() * 2) + 's';
+                    
+                    document.body.appendChild(ball);
+                    
+                    // Eliminar la bola después de 3 segundos
+                    setTimeout(() => {
+                        ball.remove();
+                    }, 3000);
+                // Quitar overlay tras la animación
+                setTimeout(() => overlay.remove(), 3000);
+                }
+            }
             
            
             
@@ -155,6 +208,9 @@
             
             // Botón de Sacar Número - Extrae un nuevo número aleatorio
             drawNumberBtn.addEventListener('click', drawNumber);
+
+            // Botón de Sacar Bolas - Extrae un nuevo número aleatorio
+            drawBallsBtn.addEventListener('click', drawBalls);
             
             
             
