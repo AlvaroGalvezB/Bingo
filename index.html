@@ -152,7 +152,7 @@
                 drawnNumbers.push(newNumber);  // Registrar el número extraído
 
                 // Reproducir el audio correspondiente al número sacado
-                const audio = new Audio(`audios_numeros/numero_${newNumber}.mp3`);
+                const audio = new Audio(`assets/audios/audios_numeros/numero_${newNumber}.mp3`);
                 audio.play().catch(err => console.error('Error al reproducir audio:', err));
 
                 // Deshabilitar temporalmente el botón para evitar más clics durante 5 s
@@ -166,6 +166,10 @@
             }
 
             function drawBalls() {
+                // Reproducir audio de movimiento de bolas
+                const moveAudio = new Audio('assets/audios/moverBolas.mp3');
+                moveAudio.play().catch(()=>{});
+                
                 // Limpiar bolas existentes
                 const existingBalls = document.querySelectorAll('.bingo-ball');
                 existingBalls.forEach(ball => ball.remove());
@@ -210,9 +214,15 @@
                     // Eliminar la bola después de 3 segundos
                     setTimeout(() => {
                         ball.remove();
+                        audio.remove();
                     }, 3000);
                 // Quitar overlay tras la animación
-                setTimeout(() => overlay.remove(), 3000);
+                setTimeout(() => {
+                        overlay.remove();
+                        // Detener y reiniciar audio
+                        moveAudio.pause();
+                        moveAudio.currentTime = 0;
+                    }, 3000);
                 }
             }
             
